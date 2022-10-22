@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.23)
+project(graphics_programming_hw1)
+
+include_directories(include)
+link_directories(lib)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+file(
+    GLOB
+    SOURCE_FILES
+    src/*.cpp
+)
+
+add_compile_definitions(NDEBUG)
+add_executable(graphics_programming_hw1 ${SOURCE_FILES} include/Camera.h)
+
+set(LIBS glew32.lib freeglut.lib)
+target_link_libraries(graphics_programming_hw1 ${LIBS})
+
+# copy graphics_programming dll to bin dir
+add_custom_command(TARGET graphics_programming_hw1 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/dll"
+        $<TARGET_FILE_DIR:graphics_programming_hw1>)
+
+# copy shader
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/shader"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/shader)
+
+# copy obj
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/obj"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/obj)
