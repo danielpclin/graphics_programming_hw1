@@ -14,7 +14,7 @@ file(
 )
 
 add_compile_definitions(NDEBUG)
-add_executable(graphics_programming_hw1 ${SOURCE_FILES} include/Camera.h)
+add_executable(graphics_programming_hw1 ${SOURCE_FILES})
 
 set(LIBS glew32.lib freeglut.lib)
 target_link_libraries(graphics_programming_hw1 ${LIBS})

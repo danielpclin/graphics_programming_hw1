@@ -1,109 +1,15 @@
 #include "Common.h"
 
-class Model
-{
-public:
-    GLuint vao;			// vertex array object
-    GLuint vbo;			// vertex buffer object
 
-    int materialId;
-    int vertexCount;
-    GLuint texture;
-};
-
-Model model;
-Program *program;
+Model* capsule;
+Model* cube;
+Model* cylinder;
+Model* plane;
+Model* sphere;
+Shader *materialShader;
+Shader *textureShader;
 glm::mat4 projection_matrix(1.0f);
 float model_rotation = 0.0f;
-
-// Load .obj model
-void load_model(const std::string& filename, const std::string& texture_filename)
-{
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warn, err;
-
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
-    if (!warn.empty()) {
-        std::cout << warn << std::endl;
-    }
-    if (!err.empty()) {
-        std::cout << err << std::endl;
-    }
-    if (!ret) {
-        exit(1);
-    }
-
-    std::vector<float> vertices, normals, tex_coords;  // if OBJ preserves vertex order, you can use element array buffer for memory efficiency
-    for (auto & shape : shapes) {  // for 'ladybug.obj', there is only one object
-        int index_offset = 0;
-        for (int f = 0; f < shape.mesh.num_face_vertices.size(); ++f) {
-            int fv = shape.mesh.num_face_vertices[f];
-            for (int v = 0; v < fv; ++v) {
-                tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
-                vertices.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
-                vertices.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
-                vertices.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
-                normals.push_back(attrib.normals[3 * idx.normal_index + 0]);
-                normals.push_back(attrib.normals[3 * idx.normal_index + 1]);
-                normals.push_back(attrib.normals[3 * idx.normal_index + 2]);
-                tex_coords.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
-                tex_coords.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
-            }
-            index_offset += fv;
-            model.vertexCount += fv;
-        }
-    }
-
-    glGenVertexArrays(1, &model.vao);
-    glBindVertexArray(model.vao);
-
-    glGenBuffers(1, &model.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, model.vbo);
-
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + normals.size() * sizeof(float) + tex_coords.size() * sizeof(float), NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
-    glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), normals.size() * sizeof(float), normals.data());
-    glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + normals.size() * sizeof(float), tex_coords.size() * sizeof(float), tex_coords.data());
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertices.size() * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertices.size() * sizeof(float) + normals.size() * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-
-    shapes.clear();
-    shapes.shrink_to_fit();
-    materials.clear();
-    materials.shrink_to_fit();
-    vertices.clear();
-    vertices.shrink_to_fit();
-    normals.clear();
-    normals.shrink_to_fit();
-    tex_coords.clear();
-    tex_coords.shrink_to_fit();
-
-    std::cout << "Load " << model.vertexCount << " vertices" << std::endl;
-
-    if (texture_filename.empty())
-        return;
-
-    TextureData textureData = loadImg(texture_filename.c_str());
-
-    glGenTextures(1, &model.texture);
-    glBindTexture(GL_TEXTURE_2D, model.texture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, textureData.width, textureData.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData.data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    delete textureData.data;
-}
 
 void init()
 {
@@ -114,14 +20,34 @@ void init()
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
-    program = new Program("shader/vertex.glsl", "shader/fragment.glsl");
-    load_model("obj/Capsule.obj", "");
-    program->use();
+    materialShader = new Shader("shader/material.vs.glsl", "shader/material.fs.glsl");
+    textureShader = new Shader("shader/texture.vs.glsl", "shader/texture.fs.glsl");
+    capsule = new Model("obj/Capsule.obj");
+    cube = new Model("obj/Cube.obj");
+    cylinder = new Model("obj/Cylinder.obj");
+    plane = new Model("obj/Plane.obj");
+    sphere = new Model("obj/Sphere.obj");
+    materialShader->use();
 
-    program->setVec3("lightPos", 3.0f, 5.0f, 10.0f);
-    program->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-    program->setVec3("objectColor", 1.0f, 0.5f, 0.3f);
+    // setup light uniform
+    glm::vec3 lightColor = glm::vec3(1.0f);
 
+    glm::vec3 ambientWeight = lightColor * glm::vec3(0.2f);
+    glm::vec3 diffuseWeight = lightColor * glm::vec3(0.5f);
+    glm::vec3 specularWeight = lightColor * glm::vec3(1.0f);
+
+    materialShader->setVec3("light.position", 3.0f, 5.0f, 10.0f);
+    materialShader->setVec3("light.ambient", ambientWeight);
+    materialShader->setVec3("light.diffuse", diffuseWeight);
+    materialShader->setVec3("light.specular", specularWeight);
+
+    // setup material uniform
+    materialShader->setVec3("material.ambient", 1.0f, 0.5f, 0.3f);
+    materialShader->setVec3("material.diffuse", 1.0f, 0.5f, 0.3f);
+    materialShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    materialShader->setFloat("material.shininess", 32.0f);
+
+    materialShader->setVec3("cameraPosition", 0.0f, 0.0f, 3.0f);
 }
 
 // GLUT callback. Called to draw the scene.
@@ -130,13 +56,13 @@ void render_callback()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // projection
-    program->setMat4("projection", projection_matrix);
+    materialShader->setMat4("projection", projection_matrix);
 
     // view
     glm::mat4 view_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 //    view_matrix = glm::rotate(view_matrix, glm::radians(model_rotation), glm::vec3(0, 1, 0));
 
-    program->setMat4("view", view_matrix);
+    materialShader->setMat4("view", view_matrix);
 
     // model 1
     glm::mat4 model_matrix(1.0f);
@@ -147,8 +73,10 @@ void render_callback()
     model_matrix = glm::rotate(model_matrix, glm::radians(0.0f), glm::vec3(0, 0, 1));
     model_matrix = glm::scale(model_matrix, glm::vec3(0.5f));
 
-    program->setMat4("model", model_matrix);
-    glDrawArrays(GL_TRIANGLES, 0, model.vertexCount);
+    materialShader->setMat4("model", model_matrix);
+    cylinder->bind();
+    glDrawArrays(GL_TRIANGLES, 0, cylinder->vertexCount);
+
 
     glm::mat4 model2_matrix(1.0f);
     model2_matrix = glm::rotate(model2_matrix, glm::radians(model_rotation), glm::vec3(0, 1, 0));
@@ -158,8 +86,10 @@ void render_callback()
     model2_matrix = glm::rotate(model2_matrix, glm::radians(60.0f), glm::vec3(0, 0, 1));
     model2_matrix = glm::scale(model2_matrix, glm::vec3(0.5f));
 
-    program->setMat4("model", model2_matrix);
-    glDrawArrays(GL_TRIANGLES, 0, model.vertexCount);
+    materialShader->setMat4("model", model2_matrix);
+    cube->bind();
+    glDrawArrays(GL_TRIANGLES, 0, cube->vertexCount);
+
 
     glm::mat4 model3_matrix(1.0f);
     model3_matrix = glm::rotate(model3_matrix, glm::radians(model_rotation), glm::vec3(0, 1, 0));
@@ -169,13 +99,14 @@ void render_callback()
     model3_matrix = glm::rotate(model3_matrix, glm::radians(60.0f), glm::vec3(0, 0, 1));
     model3_matrix = glm::scale(model3_matrix, glm::vec3(0.5f));
 
-    program->setMat4("model", model3_matrix);
-    glDrawArrays(GL_TRIANGLES, 0, model.vertexCount);
-
-
+    materialShader->setMat4("model", model3_matrix);
+    capsule->bind();
+    glDrawArrays(GL_TRIANGLES, 0, capsule->vertexCount);
 
 
     glutSwapBuffers();
+    glutPostRedisplay();
+
 }
 
 void reshape_callback(int width, int height)
@@ -233,6 +164,6 @@ int main(int argc, char *argv[])
 
     // Enter main event loop.
     glutMainLoop();
-    delete program;
+    delete materialShader;
     return 0;
 }
