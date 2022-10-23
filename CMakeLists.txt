@@ -31,8 +31,14 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         "${PROJECT_SOURCE_DIR}/shader"
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/shader)
 
-# copy obj
+# copy model
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/obj"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/obj)
+        "${PROJECT_SOURCE_DIR}/model"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/model)
+
+# copy texture
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/texture"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/texture)

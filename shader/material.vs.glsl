@@ -2,7 +2,6 @@
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 inNormal;
-layout (location = 2) in vec2 inTexture;
 
 out vec3 position;
 out vec3 normal;
@@ -16,7 +15,6 @@ void main(void)
 {
     position = vec3(model * vec4(inPosition, 1.0));
     normal = mat3(transpose(inverse(model))) * inNormal;
-    textureCoordinate = inTexture;
 
     gl_Position = projection * view * model * vec4(inPosition, 1.0);
 }

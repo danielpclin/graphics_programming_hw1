@@ -185,7 +185,7 @@ namespace detail
 
 		if(real_part < static_cast<T>(1.e-6f) * norm_u_norm_v)
 		{
-			// If u and v are exactly opposite, rotate 180 degrees
+			// If u and v are exactly opposite, rotation 180 degrees
 			// around an arbitrary orthogonal axis. Axis normalisation
 			// can happen later, when we normalise the quaternion.
 			real_part = static_cast<T>(0);

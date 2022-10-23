@@ -3,8 +3,8 @@
 class Model
 {
 public:
-    GLuint vao{};			// vertex array object
-    GLuint vbo{};			// vertex buffer object
+    GLuint vao = 0;			// vertex array object
+    GLuint vbo = 0;			// vertex buffer object
     int vertexCount = 0;
 
     // Load .obj model
@@ -65,10 +65,10 @@ public:
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertices.size() * sizeof(float) + normals.size() * sizeof(float)));
         glEnableVertexAttribArray(2);
 
-        std::cout << "Load " << vertexCount << " vertices" << std::endl;
+        std::cout << "Loaded model \"" << filename << "\", " << vertexCount << " vertices" << std::endl;
     }
 
-    void bind()
+    void bind() const
     {
         glBindVertexArray(vao);
     }

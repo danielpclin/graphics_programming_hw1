@@ -37,7 +37,8 @@ void main(void)
     // specular
     vec3 viewDirection = normalize(cameraPosition - position);
     vec3 reflectDirection = reflect(-lightDirection, normalizedNormal);
-    vec3 specular = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) * material.specular;
+    vec3 halfwayDirection = normalize(lightDirection + viewDirection);
+    vec3 specular = pow(max(dot(normalizedNormal, halfwayDirection), 0.0), material.shininess * 2) * material.specular;
 
     color = vec4((ambient * light.ambient + diffuse * light.diffuse + specular * light.specular), 1.0);
 }

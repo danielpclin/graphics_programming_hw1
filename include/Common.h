@@ -4,12 +4,6 @@
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 
-// link against glew and freegult in Visual Studio
-//#ifdef _MSC_VER
-//#pragma comment(lib, "glew32.lib")
-//#pragma comment(lib, "freeglut.lib")
-//#endif
-
 // include tinyobjloader for Wavefront OBJ format import
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -28,6 +22,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Texture.h"
+#include "Scene.h"
 
 // include standard libraries
 #include <cstdio>
