@@ -58,16 +58,17 @@ void init()
     // setup texture shader
     // setup light uniform
     textureShader->use();
-    textureShader->setVec3("light.position", 3.0f, 1.0f, 10.0f);
-    textureShader->setVec3("light.ambient", lightColor * glm::vec3(0.1f));
-    textureShader->setVec3("light.diffuse", lightColor * glm::vec3(0.6f));
+    textureShader->setVec3("light.position", 3.0f, 5.0f, 10.0f);
+    textureShader->setVec3("light.ambient", lightColor * glm::vec3(0.2f));
+    textureShader->setVec3("light.diffuse", lightColor * glm::vec3(0.8f));
     textureShader->setVec3("light.specular", lightColor * glm::vec3(1.0f));
 
     // setup material uniform
     textureShader->setVec3("material.ambient", glm::vec3(1.0f));
     textureShader->setVec3("material.diffuse", glm::vec3(1.0f));
     textureShader->setVec3("material.specular", glm::vec3(0.5f));
-    textureShader->setFloat("material.shininess", 16.0f);
+    textureShader->setFloat("material.shininess", 64.0f);
+
 
     textureShader->setVec3("cameraPosition", 0.0f, 0.0f, 3.0f);
 
@@ -77,10 +78,10 @@ void init()
     // setup scene
     scene = new Scene();
     // body
-    scene->addNode(Scene::SceneNode(cube, textureShader, treeTexture,
+    scene->addNode(Scene::SceneNode(capsule, textureShader, treeTexture,
                                     glm::vec3(0.0f, 0.0f, 0.0f),
                                     glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.8f, 1.2f, 0.8f)));
+                                    glm::vec3(0.8f, 0.8f, 0.8f)));
     // right hand
     scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
                                     glm::vec3(0.55f, -0.1f, 0.0f),
