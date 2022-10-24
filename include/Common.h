@@ -2,7 +2,7 @@
 
 // include OpenGL
 #include "GL/glew.h"
-#include "GL/freeglut.h"
+#include <GLFW/glfw3.h>
 
 // include tinyobjloader for Wavefront OBJ format import
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -33,15 +33,8 @@
 #include <string>
 #include <algorithm>
 
-// define deg2rad for converting degree to radian
-//#define deg2rad(x) ((x)*((3.1415926f)/(180.0f)))
-
-// define a simple data structure for storing texture image raw data
-
-
 // forward declaration of functions
 void printGLContextInfo();
-void printGLShaderLog(GLuint shader);
 void printGLError();
 
 // print OpenGL context related information
@@ -51,25 +44,6 @@ void printGLContextInfo()
 	printf("GL_RENDERER: %s\n", glGetString (GL_RENDERER));
 	printf("GL_VERSION: %s\n", glGetString (GL_VERSION));
 	printf("GL_SHADING_LANGUAGE_VERSION: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
-}
-
-// print the compile log of an OpenGL materialShader object, if GL_COMPILE_STATUS is GL_FALSE
-void printGLShaderLog(const GLuint shader)
-{
-	GLint isCompiled = 0;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
-	if(isCompiled == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-
-		// maxLength already includes the NULL terminator. no need to +1
-		GLchar* errorLog = new GLchar[maxLength];
-		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
-
-		printf("%s\n", errorLog);
-		delete[] errorLog;
-	}
 }
 
 // get the OpenGL error code and print its text representation

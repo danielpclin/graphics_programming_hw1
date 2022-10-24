@@ -8,7 +8,7 @@ Model* cube;
 Model* cylinder;
 Model* plane;
 Model* sphere;
-Texture* treeTexture;
+Texture* woodTexture;
 Scene *scene;
 glm::mat4 projection_matrix(1.0f);
 float model_rotation = 0.0f;
@@ -34,7 +34,7 @@ void init()
     sphere = new Model("model/Sphere.obj");
 
     // Load textures
-    treeTexture = new Texture("texture/test.jpg");
+    woodTexture = new Texture("texture/wood.jpg");
 
     // setup material shader
     // setup light uniform
@@ -53,7 +53,7 @@ void init()
     materialShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     materialShader->setFloat("material.shininess", 32.0f);
 
-    materialShader->setVec3("cameraPosition", 0.0f, 0.0f, 3.0f);
+    materialShader->setVec3("cameraPosition", 0.0f, 0.0f, 6.0f);
 
     // setup texture shader
     // setup light uniform
@@ -70,59 +70,64 @@ void init()
     textureShader->setFloat("material.shininess", 64.0f);
 
 
-    textureShader->setVec3("cameraPosition", 0.0f, 0.0f, 3.0f);
+    textureShader->setVec3("cameraPosition", 0.0f, 0.0f, 6.0f);
 
     textureShader->setInt("textureMap", 0);
-    treeTexture->bind(0);
+    woodTexture->bind(0);
 
     // setup scene
     scene = new Scene();
-    // body
-    scene->addNode(Scene::SceneNode(capsule, textureShader, treeTexture,
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.8f, 0.8f, 0.8f)));
-    // right hand
-    scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
-                                    glm::vec3(0.55f, -0.1f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.2f, 0.2f, 0.2f)));
-    // right hand
-    scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
-                                    glm::vec3(0.55f, 0.1f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.2f, 0.2f, 0.2f)));
-    // left hand
-    scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
-                                    glm::vec3(-0.55f, -0.08f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.2f, 0.2f, 0.2f)));
-    // left hand
-    scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
-                                    glm::vec3(-0.55f, 0.08f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.2f, 0.2f, 0.2f)));
-    // right leg
-    scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
-                                    glm::vec3(0.2f, -0.55f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.2f, 0.2f, 0.2f)));
-    // left leg
-    scene->addNode(Scene::SceneNode(capsule, materialShader, nullptr,
-                                    glm::vec3(-0.2f, -0.55f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.2f, 0.2f, 0.2f)));
-    scene->updateMatrices();
+    scene->addNodes({
+        Scene::SceneNode(cube, textureShader, woodTexture, -1, // body id 0
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.8f, 0.8f, 0.4f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 0, // right hand top id 1
+                         glm::vec3(0.55f, 0.15f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 6.0f),
+                         glm::vec3(0.15f, 0.4f, 0.15f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 1, // right hand bottom id 2
+                         glm::vec3(0.0f, -0.45f, 0.1f),
+                         glm::vec3(-30.0f, 0.0f, 0.0f),
+                         glm::vec3(0.15f, 0.4f, 0.15f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 0, // left hand top id 3
+                         glm::vec3(-0.55f, 0.15f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, -6.0f),
+                         glm::vec3(0.15f, 0.4f, 0.15f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 3, // left hand bottom id 4
+                         glm::vec3(0.0f, -0.45f, 0.1f),
+                         glm::vec3(-30.0f, 0.0f, 0.0f),
+                         glm::vec3(0.15f, 0.4f, 0.15f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 0, // right leg top id 5
+                         glm::vec3(0.2f, -0.55f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.15f, 0.3f, 0.15f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 5, // right leg bottom id 6
+                         glm::vec3(0.0f, -0.4f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.15f, 0.3f, 0.15f)),
+        Scene::SceneNode(cylinder, materialShader, nullptr, 0, // left leg top id 7
+                         glm::vec3(-0.2f, -0.55f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.15f, 0.15f, 0.15f)),
+        Scene::SceneNode(cylinder, materialShader, nullptr, 7, // left leg bottom id 8
+                         glm::vec3(0.0f, -0.4f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.15f, 0.15f, 0.15f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
+                         glm::vec3(0.0f, 0.6f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.5f, 0.4f, 0.4f))
+    });
 }
 
 // GLUT callback. Called to draw the scene.
-void render_callback()
+void draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // projection & view matrix
-
-    glm::mat4 view_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.2f, -3.0f));
+    glm::mat4 view_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.2f, -6.0f));
 
     materialShader->use();
     materialShader->setMat4("projection", projection_matrix);
@@ -134,35 +139,35 @@ void render_callback()
 
     scene->draw();
 
-    glutSwapBuffers();
-    glutPostRedisplay();
-
 }
 
-void reshape_callback(int width, int height)
-{
-    glViewport(0, 0, width, height);
-
-    float viewportAspect = (float)width / (float)height;
-
-    projection_matrix = glm::perspective(glm::radians(45.0f), viewportAspect, 0.1f, 100.0f);
-}
-// whenever the mouse clicks, this callback is called
-void mouse_callback(int button, int state, int x, int y)
-{
-
-}
 
 // whenever the mouse scroll wheel scrolls, this callback is called
-void scroll_callback(int wheel, int direction, int x, int y)
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    model_rotation = float(int(model_rotation + 2.0f * direction) % 360);
+    model_rotation = float(int(model_rotation + 2.0f * yoffset) % 360);
     scene->updateRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 }
-void timer_callback(int val)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    glutPostRedisplay();
-    glutTimerFunc(16, timer_callback, val);
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+    projection_matrix = glm::perspective(glm::radians(45.0f), width / (float) height, 0.1f, 100.0f);
+
+    // Re-render the scene because the current frame was drawn for the old resolution
+    draw();
+    glfwSwapBuffers(window);
+}
+static void error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
+
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 static void GLAPIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam )
@@ -171,16 +176,41 @@ static void GLAPIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint i
              ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
              type, severity, message);
 }
-
 int main(int argc, char *argv[])
 {
-    // Initialize GLUT and GLEW, then create a window.
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowPosition(100, 100);
-    glutInitWindowSize(600, 600);
-    glutCreateWindow("Graphics programming assignment 1"); // You cannot use OpenGL functions before this line; The OpenGL context must be created first by glutCreateWindow()!
-    glewInit();
+    GLFWwindow* window;
+
+    glfwSetErrorCallback(error_callback);
+
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+    window = glfwCreateWindow(640, 480, "Graphics programming assignment 1", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+
+    glfwMakeContextCurrent(window);
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+    {
+        std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+
+    glfwSwapInterval(1);
 
     glEnable(GL_DEBUG_OUTPUT);
     if (glDebugMessageCallback)
@@ -189,16 +219,23 @@ int main(int argc, char *argv[])
     printGLContextInfo();
     init();
 
-    // Register GLUT callback functions.
-    glutDisplayFunc(render_callback);
-    glutReshapeFunc(reshape_callback);
-    glutMouseFunc(mouse_callback);
-    glutMouseWheelFunc(scroll_callback);
-//    glutKeyboardFunc();
-    glutTimerFunc(16, timer_callback, 0);
+    while (!glfwWindowShouldClose(window))
+    {
+        float viewportAspect;
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
 
-    // Enter main event loop.
-    glutMainLoop();
+        glViewport(0, 0, width, height);
+        projection_matrix = glm::perspective(glm::radians(45.0f), width / (float) height, 0.1f, 100.0f);
 
-    return 0;
+        draw();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
 }

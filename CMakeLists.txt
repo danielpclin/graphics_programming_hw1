@@ -16,7 +16,7 @@ file(
 add_compile_definitions(NDEBUG)
 add_executable(graphics_programming_hw1 ${SOURCE_FILES})
 
-set(LIBS glew32.lib freeglut.lib)
+set(LIBS opengl32.lib glew32.lib glfw3dll.lib)
 target_link_libraries(graphics_programming_hw1 ${LIBS})
 
 # copy graphics_programming dll to bin dir
