@@ -13,10 +13,24 @@ file(
     src/*.cpp
 )
 
+set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui)
+add_library(IMGUI STATIC)
+
+target_sources(IMGUI
+    PRIVATE
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_impl_opengl3.cpp
+    ${IMGUI_DIR}/imgui_impl_glfw.cpp
+)
+
 add_compile_definitions(NDEBUG)
 add_executable(graphics_programming_hw1 ${SOURCE_FILES})
 
-set(LIBS opengl32.lib glew32.lib glfw3dll.lib)
+set(LIBS opengl32.lib glew32.lib glfw3dll.lib IMGUI)
 target_link_libraries(graphics_programming_hw1 ${LIBS})
 
 # copy graphics_programming dll to bin dir
