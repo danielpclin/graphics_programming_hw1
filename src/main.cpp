@@ -153,11 +153,11 @@ void draw()
     // projection & view matrix
     materialShader->use();
     materialShader->setMat4("projection", projection_matrix);
-    materialShader->setMat4("view", camera->GetViewMatrix());
+    materialShader->setMat4("view", camera->getViewMatrix());
 
     textureShader->use();
     textureShader->setMat4("projection", projection_matrix);
-    textureShader->setMat4("view", camera->GetViewMatrix());
+    textureShader->setMat4("view", camera->getViewMatrix());
 
     scene->draw();
 
@@ -171,9 +171,9 @@ void toggle_mouse(GLFWwindow* window){
     capture_mouse = !capture_mouse;
 }
 // whenever the mouse scroll wheel scrolls, this callback is called
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void scroll_callback(GLFWwindow* window, double x_offset, double y_offset)
 {
-    model_rotation = float(int(model_rotation + 2.0f * yoffset) % 360);
+    model_rotation = float(int(model_rotation + 2.0f * y_offset) % 360);
     scene->updateRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -191,12 +191,12 @@ static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
 }
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+void mouse_callback(GLFWwindow* window, double x_pos_in, double y_pos_in)
 {
     if (!capture_mouse)
         return;
-    auto x_pos = static_cast<float>(xposIn);
-    auto y_pos = static_cast<float>(yposIn);
+    auto x_pos = static_cast<float>(x_pos_in);
+    auto y_pos = static_cast<float>(y_pos_in);
 
     if (firstMouse)
     {
@@ -223,19 +223,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             toggle_mouse(window);
     }
 }
-//void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-//{
-//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-//    {
-//        if (!capture_mouse) {
-//            double x_pos, y_pos;
-//            glfwGetCursorPos(window, &x_pos, &y_pos);
-//            mouse_last_x = x_pos;
-//            mouse_last_y = y_pos;
-//            toggle_mouse(window);
-//        }
-//    }
-//}
 void mouse_button_callback(GLFWwindow* window)
 {
     if (!capture_mouse) {
@@ -284,8 +271,29 @@ void prepare_imgui()
         ImGui::EndPopup();
     }
 
+    {
+        static float f = 0.0f;
+        static int counter = 0;
 
-//
+        ImGui::Begin("Info");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Text("ImGui::IsWindowHovered() - %s", ImGui::IsWindowHovered() ? "true" : "false");
+
+        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+        ImGui::Checkbox("Another Window", &show_another_window);
+
+        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            counter++;
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+    }
+
 //    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 //    if (show_demo_window)
 //        ImGui::ShowDemoWindow(&show_demo_window);
@@ -337,7 +345,7 @@ int main(int argc, char *argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Graphics programming assignment 1", NULL, NULL);
+    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Graphics programming assignment 1", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -351,7 +359,6 @@ int main(int argc, char *argv[])
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-//    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     GLenum err = glewInit();
     if (GLEW_OK != err)
@@ -370,25 +377,13 @@ int main(int argc, char *argv[])
 
     printGLContextInfo();
 
-    // setup viewport
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-
-    glViewport(0, 0, width, height);
-    projection_matrix = glm::perspective(glm::radians(45.0f), width / (float) height, 0.1f, 100.0f);
-
-    init();
-
     // setup imgui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-    //io.ConfigViewportsNoAutoMerge = true;
-    //io.ConfigViewportsNoTaskBarIcon = true;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -405,6 +400,15 @@ int main(int argc, char *argv[])
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    // setup viewport
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    glViewport(0, 0, width, height);
+    projection_matrix = glm::perspective(glm::radians(45.0f), static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f);
+
+    init();
+
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -418,7 +422,7 @@ int main(int argc, char *argv[])
 
 
         prepare_imgui();
-        // left click lock
+        // left click lock screen
         if (!ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
             mouse_button_callback(window);
 
@@ -438,8 +442,13 @@ int main(int argc, char *argv[])
         glfwSwapBuffers(window);
     }
 
-    glfwDestroyWindow(window);
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
+    glfwDestroyWindow(window);
     glfwTerminate();
+
     exit(EXIT_SUCCESS);
 }
