@@ -173,6 +173,7 @@ void draw()
 void toggle_mouse(GLFWwindow* window){
     if (!capture_mouse){
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        firstMouse = true;
     } else {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
@@ -233,12 +234,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 void mouse_button_callback(GLFWwindow* window)
 {
-    if (!capture_mouse) {
-        auto cursor_pos = ImGui::GetCursorPos();
-        mouse_last_x = cursor_pos.x;
-        mouse_last_y = cursor_pos.y;
-        toggle_mouse(window);
-    }
+    toggle_mouse(window);
 }
 void process_input(GLFWwindow* window)
 {
@@ -275,6 +271,7 @@ void prepare_imgui()
         }
 
         ImGui::Text("Hello");
+
         if (ImGui::Button("OK")) ImGui::CloseCurrentPopup();
         ImGui::EndPopup();
     }
@@ -284,7 +281,11 @@ void prepare_imgui()
         static int counter = 0;
 
         ImGui::Begin("Info");                          // Create a window called "Hello, world!" and append into it.
-        ImGui::Text("ImGui::IsWindowHovered() - %s", ImGui::IsWindowHovered() ? "true" : "false");
+        ImGui::Text("ImGui::IsWindowHovered() - %s", ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) ? "true" : "false");
+        ImGui::Text("ImGui::IsMouseClicked(0) - %s", ImGui::IsMouseClicked(0) ? "true" : "false");
+        ImGui::Text("io.WantCaptureMouse - %s", ImGui::GetIO().WantCaptureMouse ? "true" : "false");
+        ImGui::Text("lastx, lasty - %f, %f", mouse_last_x, mouse_last_y);
+        ImGui::Text("lastx, lasty - %f, %f", mouse_last_x, mouse_last_y);
 
         ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
         ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
@@ -301,6 +302,8 @@ void prepare_imgui()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
     }
+
+//    ImGui::ShowStackToolWindow();
 
 //    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 //    if (show_demo_window)
@@ -390,8 +393,8 @@ int main(int argc, char *argv[])
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+//    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+//    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -431,7 +434,7 @@ int main(int argc, char *argv[])
 
         prepare_imgui();
         // left click lock screen
-        if (!ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+        if (!io.WantCaptureMouse && ImGui::IsMouseClicked(0))
             mouse_button_callback(window);
 
         // Render
