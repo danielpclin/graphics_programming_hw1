@@ -108,42 +108,50 @@ void init()
                          glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.8f, 0.8f, 0.4f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 0, // right hand top id 1
+        Scene::SceneNode(sphere, materialShader, nullptr, 0, // right hand joint 1
                          glm::vec3(0.55f, 0.15f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 6.0f),
+                         glm::vec3(0.2f, 0.2f, 0.2f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 1, // right hand top id 2
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.15f, 0.4f, 0.15f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 1, // right hand bottom id 2
+        Scene::SceneNode(sphere, materialShader, nullptr, 2, // right hand joint 1
                          glm::vec3(0.0f, -0.45f, 0.1f),
                          glm::vec3(-30.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.4f, 0.15f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 0, // left hand top id 3
-                         glm::vec3(-0.55f, 0.15f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, -6.0f),
-                         glm::vec3(0.15f, 0.4f, 0.15f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 3, // left hand bottom id 4
+                         glm::vec3(0.2f, 0.2f, 0.2f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 3, // right hand bottom id 3
                          glm::vec3(0.0f, -0.45f, 0.1f),
-                         glm::vec3(-30.0f, 0.0f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.15f, 0.4f, 0.15f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 0, // right leg top id 5
-                         glm::vec3(0.2f, -0.55f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.3f, 0.15f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 5, // right leg bottom id 6
-                         glm::vec3(0.0f, -0.4f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.3f, 0.15f)),
-        Scene::SceneNode(cylinder, materialShader, nullptr, 0, // left leg top id 7
-                         glm::vec3(-0.2f, -0.55f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.15f, 0.15f)),
-        Scene::SceneNode(cylinder, materialShader, nullptr, 7, // left leg bottom id 8
-                         glm::vec3(0.0f, -0.4f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.15f, 0.15f)),
-        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
-                         glm::vec3(0.0f, 0.6f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.5f, 0.4f, 0.4f))
+//        Scene::SceneNode(cube, materialShader, nullptr, 0, // left hand top id 3
+//                         glm::vec3(-0.55f, 0.15f, 0.0f),
+//                         glm::vec3(0.0f, 0.0f, -6.0f),
+//                         glm::vec3(0.15f, 0.4f, 0.15f)),
+//        Scene::SceneNode(cube, materialShader, nullptr, 3, // left hand bottom id 4
+//                         glm::vec3(0.0f, -0.45f, 0.1f),
+//                         glm::vec3(-30.0f, 0.0f, 0.0f),
+//                         glm::vec3(0.15f, 0.4f, 0.15f)),
+//        Scene::SceneNode(cube, materialShader, nullptr, 0, // right leg top id 5
+//                         glm::vec3(0.2f, -0.55f, 0.0f),
+//                         glm::vec3(0.0f, 0.0f, 0.0f),
+//                         glm::vec3(0.15f, 0.3f, 0.15f)),
+//        Scene::SceneNode(cube, materialShader, nullptr, 5, // right leg bottom id 6
+//                         glm::vec3(0.0f, -0.4f, 0.0f),
+//                         glm::vec3(0.0f, 0.0f, 0.0f),
+//                         glm::vec3(0.15f, 0.3f, 0.15f)),
+//        Scene::SceneNode(cylinder, materialShader, nullptr, 0, // left leg top id 7
+//                         glm::vec3(-0.2f, -0.55f, 0.0f),
+//                         glm::vec3(0.0f, 0.0f, 0.0f),
+//                         glm::vec3(0.15f, 0.15f, 0.15f)),
+//        Scene::SceneNode(cylinder, materialShader, nullptr, 7, // left leg bottom id 8
+//                         glm::vec3(0.0f, -0.4f, 0.0f),
+//                         glm::vec3(0.0f, 0.0f, 0.0f),
+//                         glm::vec3(0.15f, 0.15f, 0.15f)),
+//        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
+//                         glm::vec3(0.0f, 0.6f, 0.0f),
+//                         glm::vec3(0.0f, 0.0f, 0.0f),
+//                         glm::vec3(0.5f, 0.4f, 0.4f)),
     });
 }
 void draw()
@@ -174,7 +182,7 @@ void toggle_mouse(GLFWwindow* window){
 void scroll_callback(GLFWwindow* window, double x_offset, double y_offset)
 {
     model_rotation = float(int(model_rotation + 2.0f * y_offset) % 360);
-    scene->updateRotation(glm::vec3(0.0f, model_rotation, 0.0f));
+    scene->updateSceneRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
