@@ -66,37 +66,35 @@ void init()
     // setup light uniform
     glm::vec3 lightColor = glm::vec3(1.0f);
 
-
+    // setup material shader
+    // setup light uniform
     materialShader->use();
-    materialShader->setVec3("light.position", 3.0f, 5.0f, 10.0f);
+    materialShader->setVec3("light.position", 6.0f, 5.0f, 10.0f);
     materialShader->setVec3("light.ambient", lightColor * glm::vec3(0.2f));
-    materialShader->setVec3("light.diffuse", lightColor * glm::vec3(0.85f));
+    materialShader->setVec3("light.diffuse", lightColor * glm::vec3(0.7f));
     materialShader->setVec3("light.specular", lightColor * glm::vec3(1.0f));
 
     // setup material uniform
-    materialShader->setVec3("material.ambient", 0.24, 0.863, 0.518);
-    materialShader->setVec3("material.diffuse", 0.24, 0.863, 0.518);
+    materialShader->setVec3("material.ambient", 0.95, 0.88, 0.325);
+    materialShader->setVec3("material.diffuse", 0.95, 0.88, 0.325);
     materialShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     materialShader->setFloat("material.shininess", 32.0f);
 
-    materialShader->setVec3("cameraPosition", 0.0f, 0.0f, 6.0f);
 
     // setup texture shader
     // setup light uniform
     textureShader->use();
-    textureShader->setVec3("light.position", 3.0f, 5.0f, 10.0f);
+    textureShader->setVec3("light.position", 6.0f, 5.0f, 10.0f);
     textureShader->setVec3("light.ambient", lightColor * glm::vec3(0.2f));
-    textureShader->setVec3("light.diffuse", lightColor * glm::vec3(0.8f));
-    textureShader->setVec3("light.specular", lightColor * glm::vec3(1.0f));
+    textureShader->setVec3("light.diffuse", lightColor * glm::vec3(0.6f));
+    textureShader->setVec3("light.specular", lightColor * glm::vec3(0.5f));
 
     // setup material uniform
     textureShader->setVec3("material.ambient", glm::vec3(1.0f));
     textureShader->setVec3("material.diffuse", glm::vec3(1.0f));
-    textureShader->setVec3("material.specular", glm::vec3(0.5f));
-    textureShader->setFloat("material.shininess", 64.0f);
+    textureShader->setVec3("material.specular", glm::vec3(1.0f));
+    textureShader->setFloat("material.shininess", 128.0f);
 
-
-    textureShader->setVec3("cameraPosition", 0.0f, 0.0f, 6.0f);
 
     textureShader->setInt("textureMap", 0);
     woodTexture->bind(0);
@@ -108,22 +106,38 @@ void init()
                          glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.8f, 0.8f, 0.4f)),
-        Scene::SceneNode(sphere, materialShader, nullptr, 0, // right hand joint 1
-                         glm::vec3(0.55f, 0.15f, 0.0f),
+        Scene::SceneNode(sphere, materialShader, nullptr, 0, // right hand joint id 1
+                         glm::vec3(0.46f, 0.3f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 6.0f),
-                         glm::vec3(0.2f, 0.2f, 0.2f)),
+                         glm::vec3(0.25f, 0.25f, 0.25f)),
         Scene::SceneNode(cube, materialShader, nullptr, 1, // right hand top id 2
+                         glm::vec3(0.03f, -0.2f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.13f, 0.5f, 0.13f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 2, // right hand joint id 3
+                         glm::vec3(0.0f, -0.22f, 0.0f),
+                         glm::vec3(-30.0f, 0.0f, -3.0f),
+                         glm::vec3(0.22f, 0.22f, 0.22f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 3, // right hand bottom id 4
+                         glm::vec3(0.0f, -0.2f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.4f, 0.15f)),
-        Scene::SceneNode(sphere, materialShader, nullptr, 2, // right hand joint 1
-                         glm::vec3(0.0f, -0.45f, 0.1f),
-                         glm::vec3(-30.0f, 0.0f, 0.0f),
-                         glm::vec3(0.2f, 0.2f, 0.2f)),
-        Scene::SceneNode(cube, materialShader, nullptr, 3, // right hand bottom id 3
-                         glm::vec3(0.0f, -0.45f, 0.1f),
+                         glm::vec3(0.13f, 0.5f, 0.13f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 0, // right hand joint id 5
+                         glm::vec3(-0.46f, 0.3f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, -6.0f),
+                         glm::vec3(0.25f, 0.25f, 0.25f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 5, // right hand top id 6
+                         glm::vec3(-0.03f, -0.2f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.15f, 0.4f, 0.15f)),
+                         glm::vec3(0.13f, 0.5f, 0.13f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 6, // right hand joint id 7
+                         glm::vec3(0.0f, -0.22f, 0.0f),
+                         glm::vec3(-30.0f, 0.0f, 3.0f),
+                         glm::vec3(0.22f, 0.22f, 0.22f)),
+        Scene::SceneNode(cube, materialShader, nullptr, 7, // right hand bottom id 8
+                         glm::vec3(0.0f, -0.2f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.13f, 0.5f, 0.13f)),
 //        Scene::SceneNode(cube, materialShader, nullptr, 0, // left hand top id 3
 //                         glm::vec3(-0.55f, 0.15f, 0.0f),
 //                         glm::vec3(0.0f, 0.0f, -6.0f),
@@ -148,10 +162,18 @@ void init()
 //                         glm::vec3(0.0f, -0.4f, 0.0f),
 //                         glm::vec3(0.0f, 0.0f, 0.0f),
 //                         glm::vec3(0.15f, 0.15f, 0.15f)),
-//        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
-//                         glm::vec3(0.0f, 0.6f, 0.0f),
-//                         glm::vec3(0.0f, 0.0f, 0.0f),
-//                         glm::vec3(0.5f, 0.4f, 0.4f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
+                         glm::vec3(0.0f, 0.6f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.5f, 0.5f, 0.5f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 9, // head id 10
+                         glm::vec3(0.1f, 0.08f, 0.21f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.05f, 0.07f, 0.05f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 9, // head id 10
+                         glm::vec3(-0.1f, 0.08f, 0.21f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.05f, 0.07f, 0.05f)),
     });
 }
 void draw()
@@ -160,10 +182,12 @@ void draw()
 
     // projection & view matrix
     materialShader->use();
+    materialShader->setVec3("cameraPosition", camera->position);
     materialShader->setMat4("projection", projection_matrix);
     materialShader->setMat4("view", camera->getViewMatrix());
 
     textureShader->use();
+    textureShader->setVec3("cameraPosition", camera->position);
     textureShader->setMat4("projection", projection_matrix);
     textureShader->setMat4("view", camera->getViewMatrix());
 
@@ -277,70 +301,14 @@ void prepare_imgui()
     }
 
     {
-        static float f = 0.0f;
-        static int counter = 0;
-
         ImGui::Begin("Info");                          // Create a window called "Hello, world!" and append into it.
-        ImGui::Text("ImGui::IsWindowHovered() - %s", ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) ? "true" : "false");
-        ImGui::Text("ImGui::IsMouseClicked(0) - %s", ImGui::IsMouseClicked(0) ? "true" : "false");
-        ImGui::Text("io.WantCaptureMouse - %s", ImGui::GetIO().WantCaptureMouse ? "true" : "false");
-        ImGui::Text("lastx, lasty - %f, %f", mouse_last_x, mouse_last_y);
-        ImGui::Text("lastx, lasty - %f, %f", mouse_last_x, mouse_last_y);
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
+        if (ImGui::SliderFloat("model rotation", &model_rotation, 0.0f, 360.0f))
+            scene->updateSceneRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Text("Application %.1f FPS", ImGui::GetIO().Framerate);
         ImGui::End();
     }
-
-//    ImGui::ShowStackToolWindow();
-
-//    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-//    if (show_demo_window)
-//        ImGui::ShowDemoWindow(&show_demo_window);
-//
-//    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-//    {
-//        static float f = 0.0f;
-//        static int counter = 0;
-//
-//        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-//
-//        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-//        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-//        ImGui::Checkbox("Another Window", &show_another_window);
-//
-//        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-//        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-//
-//        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-//            counter++;
-//        ImGui::SameLine();
-//        ImGui::Text("counter = %d", counter);
-//
-//        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-//        ImGui::End();
-//    }
-//
-//    // 3. Show another simple window.
-//    if (show_another_window)
-//    {
-//        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-//        ImGui::Text("Hello from another window!");
-//        if (ImGui::Button("Close Me"))
-//            show_another_window = false;
-//        ImGui::End();
-//    }
 
 }
 int main(int argc, char *argv[])
