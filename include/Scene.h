@@ -1,23 +1,21 @@
+#include <utility>
+
 #ifndef SCENE_H
 #define SCENE_H
 class Scene
 {
 public:
-    struct Animation {
-        int modelId;
+    struct KeyFrame {
         glm::vec3 translation;
         glm::vec3 rotation;
         glm::vec3 scale;
-    };
-    struct KeyFrame {
-        std::vector<Animation> keyAnimation;
     };
     struct SceneNode
     {
         SceneNode(Model *model, Shader *shader, Texture *texture, glm::vec3 translation, glm::vec3 rotation, glm::vec3 scale):
                 model(model), shader(shader), texture(texture), translation(translation), rotation(rotation), scale(scale), matrix(1.0f) {}
-        SceneNode(Model *model, Shader *shader, Texture *texture, int root, glm::vec3 translation, glm::vec3 rotation, glm::vec3 scale):
-                model(model), shader(shader), texture(texture), translation(translation), root(root), rotation(rotation), scale(scale), matrix(1.0f) {}
+        SceneNode(Model *model, Shader *shader, Texture *texture, int parent, glm::vec3 translation, glm::vec3 rotation, glm::vec3 scale):
+                model(model), shader(shader), texture(texture), translation(translation), parent(parent), rotation(rotation), scale(scale), matrix(1.0f) {}
         Model* model;
         Shader* shader;
         Texture* texture;
@@ -25,7 +23,14 @@ public:
         glm::vec3 rotation;
         glm::vec3 scale;
         glm::mat4 matrix;
-        int root = -1;
+        glm::vec3 animationTranslation{};
+        glm::vec3 animationRotation{};
+        glm::vec3 animationScale{1.0};
+        std::vector<KeyFrame> keyFrames{
+            {glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(0.0f)},
+            {glm::vec3(0.0f),glm::vec3(10.0f),glm::vec3(0.0f)}
+        };
+        int parent = -1;
     };
 
 private:
@@ -51,7 +56,7 @@ public:
     }
     void updateNode(int position, SceneNode node) // update node
     {
-        nodes[position] = node;
+        nodes[position] = std::move(node);
         updateMatrices();
     }
     void draw() // render the scene
@@ -65,7 +70,7 @@ public:
             glDrawArrays(GL_TRIANGLES, 0, node.model->vertexCount);
         }
     }
-    void updateSceneMatrices(glm::vec3 _translation, glm::vec3 _rotation, glm::vec3 _scale)
+    void updateSceneVectors(glm::vec3 _translation, glm::vec3 _rotation, glm::vec3 _scale)
     {
         translation = _translation;
         rotation = _rotation;
@@ -87,14 +92,32 @@ public:
         scale = _scale;
         updateMatrices();
     }
+    void resetAnimation()
+    {
+        for (auto &node: nodes) {
+            node.animationTranslation = glm::vec3(0.0);
+            node.animationRotation = glm::vec3(0.0);
+            node.animationScale = glm::vec3(1.0);
+        }
+    }
     void animate(int deltaTime)
     {
-
-        int time = 1000;
-        std::vector<KeyFrame> keyFrames;
-
-        int keyFrameId = (lastTime + deltaTime) / time;
-        deltaTime;
+//        resetAnimation();
+//        int keyFrameId = (lastTime + deltaTime) / 1000;
+//        int timeAfterKeyFrame = (lastTime + deltaTime) % 1000;
+//        if (keyFrameId < keyFrames.size() - 1){
+//
+//            keyFrames[keyFrameId];
+//        }
+        int keyFrameId = (lastTime + deltaTime) / 1000;
+        int timeAfterKeyFrame = (lastTime + deltaTime) % 1000;
+        for (auto &node: nodes) {
+            node.animationTranslation = glm::vec3(0.0);
+            node.animationRotation = glm::vec3(0.0);
+            node.animationScale = glm::vec3(1.0);
+            int nodeKeyFrameId = keyFrameId % node.keyFrames.size();
+            node.animationTranslation = glm::mix(node.keyFrames[nodeKeyFrameId].rotation, node.keyFrames[nodeKeyFrameId+1].rotation, (float)timeAfterKeyFrame/1000);
+        }
     }
 private:
     glm::mat4 calculateSceneMatrix()
@@ -110,10 +133,10 @@ private:
         matrix = calculateSceneMatrix();
         for (auto& node: nodes) {
             glm::mat4 model_matrix;
-            if (node.root == -1){
+            if (node.parent == -1){
                 model_matrix = glm::mat4(matrix);
             }else{
-                model_matrix = glm::mat4(nodes[node.root].matrix);
+                model_matrix = glm::mat4(nodes[node.parent].matrix);
             }
             model_matrix = glm::translate(model_matrix, node.translation);
             model_matrix = model_matrix * glm::mat4(glm::quat(glm::radians(node.rotation)));

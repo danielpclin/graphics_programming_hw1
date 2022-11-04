@@ -189,6 +189,7 @@ void draw()
     textureShader->setMat4("projection", projection_matrix);
     textureShader->setMat4("view", camera->getViewMatrix());
 
+    scene->animate(deltaTime * 1000);
     scene->draw();
 
 }
@@ -396,11 +397,11 @@ int main(int argc, char *argv[])
 
         process_input(window);
 
-
         prepare_imgui();
         // left click to lock screen for camera movement
-        if (!io.WantCaptureMouse && ImGui::IsMouseClicked(0))
+        if (!io.WantCaptureMouse && ImGui::IsMouseClicked(0)) {
             mouse_button_callback(window);
+        }
 
         // Render
         ImGui::Render();
