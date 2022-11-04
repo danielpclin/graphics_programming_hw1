@@ -3,6 +3,15 @@
 class Scene
 {
 public:
+    struct Animation {
+        int modelId;
+        glm::vec3 translation;
+        glm::vec3 rotation;
+        glm::vec3 scale;
+    };
+    struct KeyFrame {
+        std::vector<Animation> keyAnimation;
+    };
     struct SceneNode
     {
         SceneNode(Model *model, Shader *shader, Texture *texture, glm::vec3 translation, glm::vec3 rotation, glm::vec3 scale):
@@ -20,6 +29,7 @@ public:
     };
 
 private:
+    int lastTime = 0;
     glm::vec3 translation;
     glm::vec3 rotation;
     glm::vec3 scale;
@@ -27,7 +37,6 @@ private:
     std::vector<SceneNode> nodes = {};
 
 public:
-
     Scene(glm::vec3 translation, glm::vec3 rotation, glm::vec3 scale):
         translation(translation), rotation(rotation), scale(scale), matrix(calculateSceneMatrix()) {}
     Scene(): translation(0.0f), rotation(0.0f), scale(1.0f), matrix(calculateSceneMatrix()) {}
@@ -77,6 +86,15 @@ public:
     {
         scale = _scale;
         updateMatrices();
+    }
+    void animate(int deltaTime)
+    {
+
+        int time = 1000;
+        std::vector<KeyFrame> keyFrames;
+
+        int keyFrameId = (lastTime + deltaTime) / time;
+        deltaTime;
     }
 private:
     glm::mat4 calculateSceneMatrix()

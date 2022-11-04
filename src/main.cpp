@@ -22,11 +22,8 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 //imgui state
-bool show_demo_window = true;
-bool show_another_window = false;
 bool run_animation = true;
 bool capture_mouse = false;
-ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 
 static void GLAPIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam )
@@ -101,6 +98,7 @@ void init()
 
     // setup scene
     scene = new Scene();
+    // TODO
     scene->addNodes({
         Scene::SceneNode(cube, textureShader, woodTexture, -1, // body id 0
                          glm::vec3(0.0f, 0.0f, 0.0f),
@@ -206,7 +204,7 @@ void toggle_mouse(GLFWwindow* window){
 // whenever the mouse scroll wheel scrolls, this callback is called
 void scroll_callback(GLFWwindow* window, double x_offset, double y_offset)
 {
-    model_rotation = float(int(model_rotation + 2.0f * y_offset) % 360);
+    model_rotation = float(int(model_rotation + 2.0f * y_offset + 360) % 360);
     scene->updateSceneRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -274,6 +272,7 @@ void process_input(GLFWwindow* window)
         camera->processKeyboard(Camera_Movement::DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         camera->processKeyboard(Camera_Movement::UP, deltaTime);
+    // TODO ijkl to move model
 }
 void prepare_imgui()
 {
@@ -361,8 +360,6 @@ int main(int argc, char *argv[])
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-//    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-//    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -401,7 +398,7 @@ int main(int argc, char *argv[])
 
 
         prepare_imgui();
-        // left click lock screen
+        // left click to lock screen for camera movement
         if (!io.WantCaptureMouse && ImGui::IsMouseClicked(0))
             mouse_button_callback(window);
 

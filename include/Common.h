@@ -27,6 +27,7 @@
 #include "Texture.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Animator.h"
 
 // include standard libraries
 #include <cstdio>
@@ -85,73 +86,3 @@ void printGLError()
         std::cout << "GL_ERROR (" << std::hex << code << std::dec << ")" << std::endl;
     }
 }
-
-
-// Change loadobj format from tinyobj V1.X to V0.9.X 
-// in order not to change OLD Lecture Shader too much Zzz...
-// You can write your own loadObj by yourself.
-//typedef struct _MeshData
-//{
-//	// if OBJ preserves vertex order, you can use element array buffer for memory efficiency
-//	// If no data return empty vector
-//	std::vector<float> positions;
-//	std::vector<float> normals;
-//	std::vector<float> texcoords;
-//	std::vector<unsigned int> indices;
-//	std::vector<unsigned char> num_vertices;
-//	std::vector<int> material_ids; // per-face material ID
-//} MeshData;
-
-// load obj file
-//std::vector<MeshData> loadObj(const char* const objFilePath)
-//{
-//	tinyobj::attrib_t attrib;
-//	std::vector<tinyobj::shape_t> shapes;
-//	std::vector<tinyobj::material_t> materials;
-//	std::string warn, err;
-//	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, objFilePath);
-//	printf("Load Models ! Shapes size %zd Material size %zd\n", shapes.size(), materials.size());
-//	if (!warn.empty()) {
-//		std::cout << warn << std::endl;
-//	}
-//	if (!err.empty()) {
-//		std::cout << err << std::endl;
-//	}
-//	if (!ret) {
-//		exit(1);
-//	}
-//
-//	std::vector<MeshData> meshes;
-//
-//	for (int s = 0; s < shapes.size(); ++s) {
-//		MeshData mesh;
-//
-//		int index_offset = 0;
-//		for (int f = 0; f < shapes[s].mesh.num_face_vertices.size(); ++f) {
-//			int fv = shapes[s].mesh.num_face_vertices[f];
-//			for (int v = 0; v < fv; ++v) {
-//				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-//				if (idx.vertex_index != -1) {
-//					mesh.positions.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
-//					mesh.positions.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
-//					mesh.positions.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
-//				}
-//				if (idx.texcoord_index != -1) {
-//					mesh.texcoords.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
-//					mesh.texcoords.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
-//				}
-//				if (idx.normal_index != -1) {
-//					mesh.normals.push_back(attrib.normals[3 * idx.normal_index + 0]);
-//					mesh.normals.push_back(attrib.normals[3 * idx.normal_index + 1]);
-//					mesh.normals.push_back(attrib.normals[3 * idx.normal_index + 2]);
-//				}
-//				mesh.indices.push_back(index_offset + v);
-//			}
-//			index_offset += fv;
-//		}
-//
-//		meshes.push_back(mesh);
-//	}
-//
-//	return meshes;
-//}
