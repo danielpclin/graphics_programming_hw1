@@ -11,8 +11,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-void main(void)
-{
+void main(void) {
     position = vec3(model * vec4(inPosition, 1.0));
     normal = mat3(transpose(inverse(model))) * inNormal;
 

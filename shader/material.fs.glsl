@@ -23,8 +23,7 @@ uniform vec3 cameraPosition;
 uniform Light light;
 uniform Material material;
 
-void main(void)
-{
+void main(void) {
     vec3 normalizedNormal = normalize(normal);
 
     // ambient

@@ -13,10 +13,10 @@ Camera *camera;
 glm::mat4 projection_matrix(1.0f);
 float model_rotation = 0.0f;
 
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 800;
-float mouse_last_x = SCREEN_WIDTH / 2.0f;
-float mouse_last_y = SCREEN_HEIGHT / 2.0f;
+const uint32_t SCREEN_WIDTH = 1000;
+const uint32_t SCREEN_HEIGHT = 800;
+float mouse_last_x = 0;
+float mouse_last_y = 0;
 bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
@@ -26,16 +26,15 @@ bool run_animation = true;
 bool capture_mouse = false;
 
 
-static void GLAPIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam )
-{
+static void GLAPIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                                            const GLchar* message, const void* userParam ) {
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
         return;
     fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
              ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
              type, severity, message);
 }
-void init()
-{
+void init() {
     glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -136,14 +135,19 @@ void init()
                          glm::vec3(0.0f, -0.2f, 0.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f),
                          glm::vec3(0.13f, 0.5f, 0.13f)),
-//        Scene::SceneNode(cube, materialShader, nullptr, 0, // left hand top id 3
-//                         glm::vec3(-0.55f, 0.15f, 0.0f),
-//                         glm::vec3(0.0f, 0.0f, -6.0f),
-//                         glm::vec3(0.15f, 0.4f, 0.15f)),
-//        Scene::SceneNode(cube, materialShader, nullptr, 3, // left hand bottom id 4
-//                         glm::vec3(0.0f, -0.45f, 0.1f),
-//                         glm::vec3(-30.0f, 0.0f, 0.0f),
-//                         glm::vec3(0.15f, 0.4f, 0.15f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
+                         glm::vec3(0.0f, 0.6f, 0.0f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.5f, 0.5f, 0.5f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 9, // right eye id 10
+                         glm::vec3(0.1f, 0.08f, 0.21f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.05f, 0.07f, 0.05f)),
+        Scene::SceneNode(sphere, materialShader, nullptr, 9, // right eye id 11
+                         glm::vec3(-0.1f, 0.08f, 0.21f),
+                         glm::vec3(0.0f, 0.0f, 0.0f),
+                         glm::vec3(0.05f, 0.07f, 0.05f)),
+
 //        Scene::SceneNode(cube, materialShader, nullptr, 0, // right leg top id 5
 //                         glm::vec3(0.2f, -0.55f, 0.0f),
 //                         glm::vec3(0.0f, 0.0f, 0.0f),
@@ -160,22 +164,9 @@ void init()
 //                         glm::vec3(0.0f, -0.4f, 0.0f),
 //                         glm::vec3(0.0f, 0.0f, 0.0f),
 //                         glm::vec3(0.15f, 0.15f, 0.15f)),
-        Scene::SceneNode(sphere, materialShader, nullptr, 0, // head id 9
-                         glm::vec3(0.0f, 0.6f, 0.0f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.5f, 0.5f, 0.5f)),
-        Scene::SceneNode(sphere, materialShader, nullptr, 9, // head id 10
-                         glm::vec3(0.1f, 0.08f, 0.21f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.05f, 0.07f, 0.05f)),
-        Scene::SceneNode(sphere, materialShader, nullptr, 9, // head id 10
-                         glm::vec3(-0.1f, 0.08f, 0.21f),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.05f, 0.07f, 0.05f)),
     });
 }
-void draw()
-{
+void draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // projection & view matrix
@@ -189,11 +180,12 @@ void draw()
     textureShader->setMat4("projection", projection_matrix);
     textureShader->setMat4("view", camera->getViewMatrix());
 
-    scene->animate(deltaTime * 1000);
+    if (run_animation)
+        scene->animate(deltaTime * 1000);
     scene->draw();
 
 }
-void toggle_mouse(GLFWwindow* window){
+void toggle_mouse(GLFWwindow* window) {
     if (!capture_mouse){
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         firstMouse = true;
@@ -203,28 +195,24 @@ void toggle_mouse(GLFWwindow* window){
     capture_mouse = !capture_mouse;
 }
 // whenever the mouse scroll wheel scrolls, this callback is called
-void scroll_callback(GLFWwindow* window, double x_offset, double y_offset)
-{
-    model_rotation = float(int(model_rotation + 2.0f * y_offset + 360) % 360);
+void scroll_callback(GLFWwindow* window, double x_offset, double y_offset) {
+    model_rotation = static_cast<float>(int(model_rotation + 2.0f * y_offset + 360) % 360);
     scene->updateSceneRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 }
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    // make sure the viewport matches the new window dimensions
     glViewport(0, 0, width, height);
-    projection_matrix = glm::perspective(glm::radians(45.0f), width / (float) height, 0.1f, 100.0f);
+    float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+    projection_matrix = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
     // Re-render the scene because the current frame was drawn for the old resolution
     draw();
     glfwSwapBuffers(window);
 }
-static void error_callback(int error, const char* description)
-{
+static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
-void mouse_callback(GLFWwindow* window, double x_pos_in, double y_pos_in)
-{
+void mouse_callback(GLFWwindow* window, double x_pos_in, double y_pos_in) {
     if (!capture_mouse)
         return;
     auto x_pos = static_cast<float>(x_pos_in);
@@ -245,8 +233,7 @@ void mouse_callback(GLFWwindow* window, double x_pos_in, double y_pos_in)
 
     camera->processMouseMovement(x_offset, y_offset);
 }
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE){
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
@@ -255,25 +242,31 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             toggle_mouse(window);
     }
 }
-void mouse_button_callback(GLFWwindow* window)
-{
+void mouse_button_callback(GLFWwindow* window) {
     toggle_mouse(window);
 }
-void process_input(GLFWwindow* window)
-{
+void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera->processKeyboard(Camera_Movement::FORWARD, deltaTime);
+        camera->processKeyboard(Camera::FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera->processKeyboard(Camera_Movement::LEFT, deltaTime);
+        camera->processKeyboard(Camera::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera->processKeyboard(Camera_Movement::BACKWARD, deltaTime);
+        camera->processKeyboard(Camera::BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->processKeyboard(Camera_Movement::RIGHT, deltaTime);
+        camera->processKeyboard(Camera::RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera->processKeyboard(Camera_Movement::DOWN, deltaTime);
+        camera->processKeyboard(Camera::DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera->processKeyboard(Camera_Movement::UP, deltaTime);
+        camera->processKeyboard(Camera::UP, deltaTime);
     // TODO ijkl to move model
+//    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+//        camera->processKeyboard(Camera_Movement::FORWARD, deltaTime);
+//    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+//        camera->processKeyboard(Camera_Movement::LEFT, deltaTime);
+//    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+//        camera->processKeyboard(Camera_Movement::BACKWARD, deltaTime);
+//    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+//        camera->processKeyboard(Camera_Movement::RIGHT, deltaTime);
 }
 void prepare_imgui()
 {
@@ -281,16 +274,18 @@ void prepare_imgui()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
     // right click context menu
     if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && ImGui::IsMouseClicked(1))
         ImGui::OpenPopup("contextmenu");
-    if (ImGui::BeginPopup("contextmenu"))
-    {
+
+    if (ImGui::BeginPopup("contextmenu")) {
         if (run_animation){
-            if(ImGui::Button("Stop animation"))
+            if (ImGui::Button("Stop animation"))
                 run_animation = !run_animation;
         }else{
-            if(ImGui::Button("Run animation"))
+            if (ImGui::Button("Run animation"))
                 run_animation = !run_animation;
         }
 
@@ -301,18 +296,23 @@ void prepare_imgui()
     }
 
     {
-        ImGui::Begin("Info");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Info");
 
         if (ImGui::SliderFloat("model rotation", &model_rotation, 0.0f, 360.0f))
             scene->updateSceneRotation(glm::vec3(0.0f, model_rotation, 0.0f));
 
-        ImGui::Text("Application %.1f FPS", ImGui::GetIO().Framerate);
+        ImGui::Text("Application %.1f FPS", io.Framerate);
+        ImGui::Text("Left click to mount/unmount camera");
+        ImGui::Text("E to unmount camera");
+        ImGui::Text("WASD, ctrl, space to move camera");
+        ImGui::Text("Rotation %s", glm::to_string(scene->getNode(8).animationRotation).c_str());
+        ImGui::Text("Rotation %s", glm::to_string(glm::degrees(glm::eulerAngles(scene->getNode(8).animationRotation))).c_str());
+
         ImGui::End();
     }
 
 }
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     GLFWwindow* window;
 
     glfwSetErrorCallback(error_callback);
@@ -325,8 +325,7 @@ int main(int argc, char *argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Graphics programming assignment 1", nullptr, nullptr);
-    if (!window)
-    {
+    if (!window) {
         glfwTerminate();
         return EXIT_FAILURE;
     }
@@ -340,8 +339,7 @@ int main(int argc, char *argv[])
     glfwSetCursorPosCallback(window, mouse_callback);
 
     GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
+    if (GLEW_OK != err) {
         std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
         glfwTerminate();
         return -1;
@@ -360,18 +358,10 @@ int main(int argc, char *argv[])
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-
-    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -382,12 +372,12 @@ int main(int argc, char *argv[])
     glfwGetFramebufferSize(window, &width, &height);
 
     glViewport(0, 0, width, height);
-    projection_matrix = glm::perspective(glm::radians(45.0f), static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f);
+    float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+    projection_matrix = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 
     init();
 
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         // calculate frame time
@@ -407,14 +397,6 @@ int main(int argc, char *argv[])
         ImGui::Render();
         draw();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
-        }
 
         glfwSwapBuffers(window);
     }

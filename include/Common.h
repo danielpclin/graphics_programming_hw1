@@ -19,7 +19,8 @@
 #define GLM_FORCE_SWIZZLE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/io.hpp"
+#include "glm/gtx/string_cast.hpp"
 
 // include Shader.h (gl materialShader helper)
 #include "Shader.h"
@@ -27,7 +28,6 @@
 #include "Texture.h"
 #include "Scene.h"
 #include "Camera.h"
-#include "Animator.h"
 
 // include standard libraries
 #include <cstdio>
@@ -43,8 +43,7 @@ void printGLContextInfo();
 void printGLError();
 
 // print OpenGL context related information
-void printGLContextInfo()
-{
+void printGLContextInfo() {
 	printf("GL_VENDOR: %s\n", glGetString (GL_VENDOR));
 	printf("GL_RENDERER: %s\n", glGetString (GL_RENDERER));
 	printf("GL_VERSION: %s\n", glGetString (GL_VERSION));
@@ -53,11 +52,9 @@ void printGLContextInfo()
 
 // get the OpenGL error code and print its text representation
 // note that the error code is reset to GL_NO_ERROR after the glGetError() call
-void printGLError()
-{
+void printGLError() {
     GLenum code = glGetError();
-    switch(code)
-    {
+    switch(code) {
     case GL_NO_ERROR:
         std::cout << "GL_NO_ERROR" << std::endl;
         break;

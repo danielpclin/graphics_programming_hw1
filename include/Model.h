@@ -1,30 +1,27 @@
 #ifndef MODEL_H
 #define MODEL_H
-class Model
-{
+class Model {
 public:
-    GLuint vao = 0;			// vertex array object
-    GLuint vbo = 0;			// vertex buffer object
+    GLuint vao = 0; // vertex array object
+    GLuint vbo = 0; // vertex buffer object
     int vertexCount = 0;
 
     // Load .obj model
-    explicit Model(const std::string& filename)
-    {
+    explicit Model(const std::string& filename) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
         std::string warn, err;
 
         bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
-        if (!warn.empty()) {
+
+        if (!warn.empty())
             std::cout << warn << std::endl;
-        }
-        if (!err.empty()) {
+        if (!err.empty())
             std::cout << err << std::endl;
-        }
-        if (!ret) {
+        if (!ret)
             exit(1);
-        }
+
 
         std::vector<float> vertices, normals, tex_coords;  // if OBJ preserves vertex order, you can use element array buffer for memory efficiency
         for (auto & shape : shapes) {  // for 'ladybug.obj', there is only one object
@@ -68,8 +65,7 @@ public:
         std::cout << "Loaded model \"" << filename << "\", " << vertexCount << " vertices" << std::endl;
     }
 
-    void bind() const
-    {
+    void bind() const {
         glBindVertexArray(vao);
     }
 };
