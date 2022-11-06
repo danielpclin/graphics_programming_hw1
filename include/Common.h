@@ -22,21 +22,14 @@
 #include "glm/gtx/io.hpp"
 #include "glm/gtx/string_cast.hpp"
 
-// include Shader.h (gl materialShader helper)
-#include "Shader.h"
-#include "Model.h"
-#include "Texture.h"
-#include "Scene.h"
-#include "Camera.h"
 
 // include standard libraries
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <string>
+#include <fstream>
+#include <sstream>
 
 // forward declaration of functions
 void printGLContextInfo();
